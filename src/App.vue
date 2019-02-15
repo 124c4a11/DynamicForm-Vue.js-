@@ -6,13 +6,20 @@
       </div>
     </header>
 
-    <div class="content"></div>
+    <div class="content">
+      <FormWizard/>
+    </div>
   </div>
 </template>
 
 <script>
+import FormWizard from './components/FormWizard'
 
 export default {
-  name: 'app'
+  name: 'app',
+
+  components: {
+    FormWizard
+  }
 }
 </script>
