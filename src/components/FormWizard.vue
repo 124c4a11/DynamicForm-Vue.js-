@@ -3,6 +3,7 @@
     <FormPlanPicker v-if="currentStepNumber === 1"/>
     <FormUserDetails v-if="currentStepNumber === 2"/>
     <FormAddress v-if="currentStepNumber === 3"/>
+    <FormReviewOrder v-if="currentStepNumber === 4"/>
 
     <div class="progress-bar">
       <div :style="`width: ${progress}%;`"></div>
@@ -29,6 +30,7 @@
 import FormPlanPicker from './FormPlanPicker'
 import FormUserDetails from './FormUserDetails'
 import FormAddress from './FormAddress'
+import FormReviewOrder from './FormReviewOrder'
 
 export default {
   name: 'FormWizard',
@@ -36,7 +38,8 @@ export default {
   components: {
     FormPlanPicker,
     FormUserDetails,
-    FormAddress
+    FormAddress,
+    FormReviewOrder
   },
 
   data () {
