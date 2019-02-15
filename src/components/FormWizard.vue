@@ -1,6 +1,7 @@
 <template>
   <div>
     <FormPlanPicker v-if="currentStepNumber === 1"/>
+    <FormUserDetails v-if="currentStepNumber === 2"/>
 
     <div class="progress-bar">
       <div :style="`width: ${progress}%;`"></div>
@@ -25,12 +26,14 @@
 
 <script>
 import FormPlanPicker from './FormPlanPicker'
+import FormUserDetails from './FormUserDetails'
 
 export default {
   name: 'FormWizard',
 
   components: {
-    FormPlanPicker
+    FormPlanPicker,
+    FormUserDetails
   },
 
   data () {
