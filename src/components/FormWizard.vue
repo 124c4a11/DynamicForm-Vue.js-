@@ -7,6 +7,7 @@
           :is="currentStep"
           :wizard-data="form"
           @update="processStep"
+          @updateAsyncState="updateAsyncState"
         />
       </keep-alive>
 
@@ -146,6 +147,10 @@ export default {
           this.currentStepNumber++
           this.asyncState = 'success'
         })
+    },
+
+    updateAsyncState (state) {
+      this.asyncState = state
     }
   }
 }
