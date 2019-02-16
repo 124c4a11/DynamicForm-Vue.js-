@@ -75,7 +75,14 @@ export default {
   methods: {
     pickPlan (plan) {
       this.selectedPlan = plan
-      this.$emit('update', { plan: this.selectedPlan })
+
+      this.$emit('update', {
+        data: {
+          plan: this.selectedPlan
+        },
+
+        valid: !this.$v.$invalid
+      })
     }
   }
 }

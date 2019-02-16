@@ -1,10 +1,12 @@
 <template>
   <div>
-    <component
-      :is="currentStep"
-      :wizard-data="form"
-      @update="processStep"
-    />
+    <keep-alive>
+      <component
+        :is="currentStep"
+        :wizard-data="form"
+        @update="processStep"
+      />
+    </keep-alive>
 
     <div class="progress-bar">
       <div :style="`width: ${progress}%;`"></div>
@@ -86,6 +88,7 @@ export default {
   methods: {
     goBack () {
       this.currentStepNumber--
+      this.canGoNext = true
     },
 
     goNext () {
@@ -93,9 +96,9 @@ export default {
       this.canGoNext = false
     },
 
-    processStep (stepData) {
-      Object.assign(this.form, stepData)
-      this.canGoNext = true
+    processStep (step) {
+      Object.assign(this.form, step.data)
+      this.canGoNext = step.valid
     }
   }
 }
