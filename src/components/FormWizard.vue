@@ -17,6 +17,7 @@
         class="btn-outlined"
       >Back</button>
       <button
+        :disabled="!canGoNext"
         @click="goNext"
         class="btn"
       >Next</button>
@@ -45,6 +46,7 @@ export default {
   data () {
     return {
       currentStepNumber: 1,
+      canGoNext: false,
       length: 4,
 
       form: {
@@ -73,10 +75,12 @@ export default {
 
     goNext () {
       this.currentStepNumber++
+      this.canGoNext = false
     },
 
     processStep (stepData) {
       Object.assign(this.form, stepData)
+      this.canGoNext = true
     }
   }
 }
