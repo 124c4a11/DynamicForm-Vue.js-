@@ -33,7 +33,7 @@ export const authenticateUser = (email, password) => {
 }
 
 export const postFormToDB = (form) => {
-  return new Promise((resolve,) => {
+  return new Promise((resolve) => {
     setTimeout(() => resolve(form), 1000)
   })
 }
