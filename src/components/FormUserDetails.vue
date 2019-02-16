@@ -4,7 +4,7 @@
 
     <h2 class="subtitle">Create an account or log in to order your liquid gold subscription</h2>
 
-    <form class="form">
+    <form @input="submit" class="form">
       <div class="form-group">
         <label class="form-label" for="email">Email</label>
         <input
@@ -78,12 +78,20 @@ export default {
         email
       },
 
-      password: {
-        required
-      },
+      password: { required },
 
-      name: {
-        required
+      name: { required }
+    }
+  },
+
+  methods: {
+    submit () {
+      if (!this.$v.$invalid) {
+        this.$emit('update', {
+          email: this.form.email,
+          password: this.form.password,
+          name: this.form.name
+        })
       }
     }
   }
