@@ -65,6 +65,8 @@ export default {
     }
   },
 
+  validations: {},
+
   data () {
     return {
       form: {
