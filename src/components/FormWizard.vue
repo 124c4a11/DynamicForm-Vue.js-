@@ -1,41 +1,50 @@
 <template>
-  <div v-if="wizardInProgress">
-    <keep-alive>
-      <component
-        ref="currentStep"
-        :is="currentStep"
-        :wizard-data="form"
-        @update="processStep"
-      />
-    </keep-alive>
+  <div>
+    <div v-if="wizardInProgress" v-show="asyncState !== 'pending'">
+      <keep-alive>
+        <component
+          ref="currentStep"
+          :is="currentStep"
+          :wizard-data="form"
+          @update="processStep"
+        />
+      </keep-alive>
 
-    <div class="progress-bar">
-      <div :style="`width: ${progress}%;`"></div>
+      <div class="progress-bar">
+        <div :style="`width: ${progress}%;`"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="buttons">
+        <button
+          @click="goBack"
+          v-if="currentStepNumber > 1"
+          class="btn-outlined"
+        >Back</button>
+        <button
+          :disabled="!canGoNext"
+          @click="nextButtonAction"
+          class="btn"
+        >{{ isLastStep ? 'Complete Order' : 'Next' }}</button>
+      </div>
+
+      <pre><code>{{form}}</code></pre>
     </div>
 
-    <!-- Actions -->
-    <div class="buttons">
-      <button
-        @click="goBack"
-        v-if="currentStepNumber > 1"
-        class="btn-outlined"
-      >Back</button>
-      <button
-        :disabled="!canGoNext"
-        @click="nextButtonAction"
-        class="btn"
-      >{{ isLastStep ? 'Complete Order' : 'Next' }}</button>
+    <div v-else>
+      <h1 class="title">Thank you!</h1>
+      <h2 class="subtitle">We look forward to shipping you your first box!</h2>
+      <p class="text-center">
+        <a href="#" class="btn">Go somewhere cool!</a>
+      </p>
     </div>
 
-    <pre><code>{{form}}</code></pre>
-  </div>
-
-  <div v-else>
-    <h1 class="title">Thank you!</h1>
-    <h2 class="subtitle">We look forward to shipping you your first box!</h2>
-    <p class="text-center">
-      <a href="#" class="btn">Go somewhere cool!</a>
-    </p>
+    <div class="loading-wrapper" v-if="asyncState === 'pending'">
+      <div class="loader">
+        <img src="/spinner.svg" alt="">
+        <p>Please wait, we're hitting our servers!</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -61,6 +70,7 @@ export default {
     return {
       currentStepNumber: 1,
       canGoNext: false,
+      asyncState: null,
 
       steps: [
         'FormPlanPicker',
@@ -129,9 +139,12 @@ export default {
     },
 
     submitOrder () {
+      this.asyncState = 'pending'
+
       postFormToDB(this.form)
         .then(() => {
           this.currentStepNumber++
+          this.asyncState = 'success'
         })
     }
   }
