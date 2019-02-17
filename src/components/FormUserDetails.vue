@@ -4,17 +4,20 @@
 
     <h2 class="subtitle">Create an account or log in to order your liquid gold subscription</h2>
 
-    <form v-if="!loggedIn" @input="submit" class="form">
+    <form v-if="!loggedIn" class="form">
       <div class="form-group">
         <label class="form-label" for="email">Email</label>
         <input
           v-model="$v.form.email.$model"
-          @input="checkIfUserExists"
+          :disabled="emailCheckedInDB"
           type="text"
           id="email"
           class="form-control"
           placeholder="your@email.com"
         >
+        <div v-if="emailCheckedInDB" class="error info">
+          <a href="#" @click="reset">Not you?</a>
+        </div>
         <div
           v-if="$v.form.email.$error && !$v.form.email.required"
           class="error"
@@ -42,10 +45,6 @@
           v-if="$v.form.password.$error && !$v.form.password.correct"
           class="error"
         >password is invalid - try again</div>
-      </div>
-
-      <div v-if="existingUser" class="form-group">
-        <button @click.prevent="login" class="btn">Login</button>
       </div>
 
       <div v-if="emailCheckedInDB && !existingUser" class="form-group">
@@ -132,6 +131,8 @@ export default {
             this.emailCheckedInDB = true
             this.$emit('updateAsyncState', 'success')
           })
+      } else {
+        return Promise.reject('email is invalid')
       }
     },
 
@@ -145,7 +146,6 @@ export default {
           .then((user) => {
             // LOGGED IN
             this.form.name = user.name
-            this.submit()
             this.$emit('updateAsyncState', 'success')
           })
           .catch(() => {
@@ -153,6 +153,8 @@ export default {
             this.wrongPassword = true
             this.$emit('updateAsyncState', 'success')
           })
+      } else {
+        return Promise.reject('password is invalid')
       }
     },
 
@@ -167,14 +169,35 @@ export default {
     },
 
     submit () {
-      this.$emit('update', {
-        data: {
-          email: this.form.email,
-          password: this.form.password,
-          name: this.form.name
-        },
+      let job
 
-        valid: !this.$v.$invalid
+      if (!this.emailCheckedInDB) {
+        this.$v.form.email.$touch()
+        job = this.checkIfUserExists()
+      } else {
+        if (this.existingUser && !this.loggedIn) {
+          this.$v.form.password.$touch()
+          job = this.login()
+        } else {
+          // new user is typing info manually
+          this.$v.$touch()
+          job = Promise.resolve()
+        }
+      }
+
+      return new Promise((resolve, reject) => {
+        job.then(() => {
+          if (!this.$v.$invalid) {
+            resolve({
+              email: this.form.email,
+              password: this.form.password,
+              name: this.form.name
+            })
+          } else {
+            reject('data is not valid yet')
+          }
+        })
+          .catch(error => reject(error))
       })
     }
   }

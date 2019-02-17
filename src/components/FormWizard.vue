@@ -6,7 +6,6 @@
           ref="currentStep"
           :is="currentStep"
           :wizard-data="form"
-          @update="processStep"
           @updateAsyncState="updateAsyncState"
         />
       </keep-alive>
@@ -23,13 +22,10 @@
           class="btn-outlined"
         >Back</button>
         <button
-          :disabled="!canGoNext"
           @click="nextButtonAction"
           class="btn"
         >{{ isLastStep ? 'Complete Order' : 'Next' }}</button>
       </div>
-
-      <pre><code>{{form}}</code></pre>
     </div>
 
     <div v-else>
@@ -70,7 +66,6 @@ export default {
   data () {
     return {
       currentStepNumber: 1,
-      canGoNext: false,
       asyncState: null,
 
       steps: [
@@ -118,25 +113,24 @@ export default {
   methods: {
     goBack () {
       this.currentStepNumber--
-      this.canGoNext = true
     },
 
     goNext () {
       this.currentStepNumber++
-
-      this.$nextTick(() => {
-        this.canGoNext = !this.$refs.currentStep.$v.$invalid
-      })
     },
 
     nextButtonAction () {
-      if (this.isLastStep) this.submitOrder()
-      else this.goNext()
-    },
+      this.$refs.currentStep.submit()
+        .then(stepData => {
+          Object.assign(this.form, stepData)
 
-    processStep (step) {
-      Object.assign(this.form, step.data)
-      this.canGoNext = step.valid
+          if (this.isLastStep) {
+            this.submitOrder()
+          } else {
+            this.goNext()
+          }
+        })
+        .catch(error => console.log(error))
     },
 
     submitOrder () {
